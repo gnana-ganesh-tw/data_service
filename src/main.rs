@@ -1,50 +1,35 @@
-use std::fs::OpenOptions;
+use actix_web::{App, HttpResponse, HttpServer, post, web};
+use message::MessageData;
+use rusqlite::{Connection};
 
-use actix_web::{App, HttpServer, post, Result, web};
-use serde::Deserialize;
 
-#[derive(Deserialize, Debug)]
-struct MessageData {
-    #[serde(alias = "RF_ID")]
-    rf_id: String,
-    #[serde(alias = "ChargePointID")]
-    charge_point_id: String,
-    #[serde(alias = "MessageType")]
-    message_type: String,
-    #[serde(alias = "TimeStamp")]
-    time_stamp: String,
-    #[serde(alias = "Status")]
-    status: String,
-}
-
-#[post("/write")]
-async fn write(message: web::Json<MessageData>) -> Result<String> {
-    let path = "data.csv";
-    let mut file = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(path)
-        .unwrap();
-    let mut writer = csv::Writer::from_writer(file);    
-writer.write_record(&[
-        &message.rf_id,
-        &message.charge_point_id,
-        &message.message_type,
-        &message.time_stamp,
-        &message.status,
-    ]).unwrap();
-	println!("{:#?}", message);
-	println!("==========================================");
-    Ok(format!("{:#?}", message))
-}
+mod message;
+mod csv_writer;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(||
         App::new()
-            .service(write)
-    )
+            .service(csv_writer::write).service(db_write))
         .bind(("127.0.0.1", 8080))?
         .run()
         .await
 }
+
+
+#[post("/write")]
+pub async fn db_write(message: web::Json<MessageData>) -> HttpResponse {
+    let conn = Connection::open("data.db").unwrap();
+    conn.execute("INSERT INTO ocpp_message_store \
+        (RF_ID , ChargePointID, MessageType , TimeStamp , Status)\
+         VALUES (?1,?2,?3,?4,?5)",
+                 (&message.rf_id,
+                  &message.charge_point_id,
+                  &message.message_type,
+                  &message.time_stamp,
+                  &message.status),
+    ).unwrap();
+    conn.close().expect("Unable to close the DB");
+    HttpResponse::Ok().body("Write to DB successful")
+}
+

@@ -1,4 +1,5 @@
-message[0],message[1],message[2],message[3],message[4]
-message[0],message[1],message[2],message[3],message[4]
+RF_ID , ChargePointID, MessageType , TimeStamp , StatusNA,chargePoint2,HeartbeatRequest,2022-07-21 16:50:49.370931 +0530 IST m=+2135.144827417, 
+NA,chargePoint2,HeartbeatRequest,2022-07-21 16:50:59.371493 +0530 IST m=+2145.145261709, 
+NA,chargePoint2,HeartbeatRequest,2022-07-21 16:51:09.372008 +0530 IST m=+2155.145649584, 
+NA,chargePoint2,HeartbeatRequest,2022-07-21 16:51:19.372025 +0530 IST m=+2165.145539542, 
 message[0],,message[2],message[3],message[4]
-,,,,
