@@ -25,15 +25,16 @@ async fn write(message: web::Json<MessageData>) -> Result<String> {
         .append(true)
         .open(path)
         .unwrap();
-    let mut writer = csv::Writer::from_writer(file);
-    writer.write_record(&[
+    let mut writer = csv::Writer::from_writer(file);    
+writer.write_record(&[
         &message.rf_id,
         &message.charge_point_id,
         &message.message_type,
         &message.time_stamp,
         &message.status,
     ]).unwrap();
-
+	println!("{:#?}", message);
+	println!("==========================================");
     Ok(format!("{:#?}", message))
 }
 
