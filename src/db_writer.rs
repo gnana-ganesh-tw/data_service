@@ -17,6 +17,5 @@ pub async fn db_write(message: web::Json<MessageData>) -> HttpResponse {
     conn.close().expect("Unable to close the DB");
     println!("{:#?}", message);
     println!("============================================");
-
     HttpResponse::Ok().body("Write to DB successful")
 }
